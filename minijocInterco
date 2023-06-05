@@ -1,0 +1,130 @@
+<head>
+    <title>Joc de clicar botons amb lletra</title>
+    <style type="text/css">
+        #caixa {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #888888;
+            display: none;
+            gap: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mini joc Codi Interco</h1>
+    <p>Mostrant la lletra:</p>
+    <h2 id="lletra"></h2>
+    <p>Selecciona el botó correcte:</p>
+    <button id="botonA"></button>
+    <button id="botonB"></button>
+    <button id="botonC"></button>
+
+    <div id="caixa"></div>
+
+    <script type="text/javascript">
+        var lletres = [
+            { lletra: 'A', nom: 'Alfa' },
+            { lletra: 'B', nom: 'Bravo' },
+            { lletra: 'C', nom: 'Charlie' }
+        ];
+        var lletra = document.getElementById('lletra');
+        var index = 0;
+
+        // Shuffle array
+        for (let i = lletres.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lletres[i], lletres[j]] = [lletres[j], lletres[i]];
+        }
+
+        // Display first letter
+        lletra.innerHTML = lletres[index].lletra;
+        var lletraCorrecta = lletres[index];
+
+        // Create a copy of the lletres array and shuffle it
+        var lletresBotons = [...lletres];
+        for (let i = lletresBotons.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lletresBotons[i], lletresBotons[j]] = [lletresBotons[j], lletresBotons[i]];
+        }
+
+        var botons = [
+            document.getElementById('botonA'),
+            document.getElementById('botonB'),
+            document.getElementById('botonC')
+            
+        ];
+        for (var i = 0; i < botons.length; i++) {
+            botons[i].innerHTML = lletresBotons[i].nom;
+            botons[i].addEventListener('click', function() {
+                comprova(this.innerHTML);
+            });
+        }
+
+        // Add a counter for the number of correct guesses
+        var encerts = 0;
+
+        function comprova(nom) {
+            if (nom === lletraCorrecta.nom) {
+                mostraCaixa('Correcte!');
+                encerts++;
+                // Do not move to the next letter here
+                // index++;
+                // if (index < lletres.length) {
+                //     // Display next letter
+                //     lletra.innerHTML = lletres[index].lletra;
+                //     lletraCorrecta = lletres[index];
+                // } else {
+                //     // All letters have been shown
+                //     mostraCaixa('Fi de la partida!');
+                // }
+            } else {
+                mostraCaixa('Incorrecte! La lletra és ' + lletraCorrecta.nom + '.');
+            }
+        }
+
+        function mostraCaixa(text) {
+            var caixa = document.getElementById('caixa');
+            var contingut = document.createTextNode(text);
+            while (caixa.firstChild) {
+                caixa.removeChild(caixa.firstChild);
+            }
+            caixa.appendChild(contingut);
+
+            if (index < lletres.length) {
+                // Create a button element
+                var button = document.createElement('button');
+                button.innerHTML = 'Continuar';
+                button.addEventListener('click', function() {
+                    // Hide the box and move to the next letter
+                    caixa.style.display = 'none';
+                    index++;
+                    if (index < lletres.length) {
+                        // Display next letter
+                        lletra.innerHTML = lletres[index].lletra;
+                        lletraCorrecta = lletres[index];
+                    } else {
+                        // All letters have been shown
+                        mostraCaixa('Fi de la partida! Encerts: ' + encerts);
+                        for (var i = 0; i < botons.length; i++) {
+                            botons[i].disabled = true;
+                        }
+                        var playAgainButton = document.createElement('button');
+                        playAgainButton.innerHTML = 'Tornar a jugar';
+                        playAgainButton.addEventListener('click', function() {
+                            location.reload();
+                        });
+                        caixa.appendChild(playAgainButton);
+                    }
+                });
+                caixa.appendChild(button);
+            }
+
+            caixa.style.display = 'flex';
+        }
+    </script>
+</body>
